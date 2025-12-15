@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Hammer, Settings, Blocks } from "lucide-react";
+import { Hammer, Blocks, Settings } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,6 +15,7 @@ import {
 
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,6 +28,9 @@ export function ControlMenu() {
   const [mode, setMode] = useState<"destroyer" | "creator">("destroyer");
   const [physicsMode, setPhysicsMode] = useState(false);
 
+  const [gravity, setGravity] = useState(9.8);
+  const [mass, setMass] = useState(1);
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -34,15 +38,17 @@ export function ControlMenu() {
           <SidebarGroupLabel>Mode</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem className="flex items-center justify-between">
+              <SidebarMenuItem className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2">
                   <Hammer size={16} />
                   Destroyer
                 </span>
+
                 <Switch
                   checked={mode === "creator"}
                   onCheckedChange={(v) => setMode(v ? "creator" : "destroyer")}
                 />
+
                 <span className="flex items-center gap-2">
                   <Blocks size={16} />
                   Creator
@@ -51,9 +57,10 @@ export function ControlMenu() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {mode === "destroyer" && (
+
+        {mode === "creator" && (
           <SidebarGroup>
-            <SidebarGroupLabel>Destroyer Settings</SidebarGroupLabel>
+            <SidebarGroupLabel>Creator Tools</SidebarGroupLabel>
             <SidebarGroupContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm text-muted-foreground">
@@ -73,16 +80,6 @@ export function ControlMenu() {
             </SidebarGroupContent>
           </SidebarGroup>
         )}
-        {mode === "creator" && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Creator Objectives</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <p className="text-sm text-muted-foreground">
-                Reach the target height using projectile placement.
-              </p>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
         <SidebarGroup>
           <SidebarGroupLabel>Physics</SidebarGroupLabel>
           <SidebarGroupContent className="space-y-4">
@@ -95,19 +92,50 @@ export function ControlMenu() {
             </div>
 
             {physicsMode && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm text-muted-foreground">
-                    Gravity (g)
+                    Gravity (m/s²)
                   </label>
-                  <Slider min={1} max={20} step={0.1} defaultValue={[9.8]} />
-                </div>
 
+                  <div className="flex items-center gap-2">
+                    <Slider
+                      min={1}
+                      max={20}
+                      step={0.1}
+                      value={[gravity]}
+                      onValueChange={([v]) => setGravity(v)}
+                    />
+                    <Input
+                      type="number"
+                      step="0.1"
+                      className="w-20"
+                      value={gravity}
+                      onChange={(e) => setGravity(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm text-muted-foreground">
-                    Projectile Mass
+                    Mass (kg)
                   </label>
-                  <Slider min={0.1} max={10} step={0.1} defaultValue={[1]} />
+
+                  <div className="flex items-center gap-2">
+                    <Slider
+                      min={0.1}
+                      max={10}
+                      step={0.1}
+                      value={[mass]}
+                      onValueChange={([v]) => setMass(v)}
+                    />
+                    <Input
+                      type="number"
+                      step="0.1"
+                      className="w-20"
+                      value={mass}
+                      onChange={(e) => setMass(Number(e.target.value))}
+                    />
+                  </div>
                 </div>
               </div>
             )}
