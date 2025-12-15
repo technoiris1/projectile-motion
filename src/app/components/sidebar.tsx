@@ -1,4 +1,7 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Hammer, Settings, Blocks } from "lucide-react";
 
 import {
   Sidebar,
@@ -7,58 +10,107 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function ControlMenu() {
+  const [mode, setMode] = useState<"destroyer" | "creator">("destroyer");
+  const [physicsMode, setPhysicsMode] = useState(false);
+
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Mode</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Hammer size={16} />
+                  Destroyer
+                </span>
+                <Switch
+                  checked={mode === "creator"}
+                  onCheckedChange={(v) => setMode(v ? "creator" : "destroyer")}
+                />
+                <span className="flex items-center gap-2">
+                  <Blocks size={16} />
+                  Creator
+                </span>
+              </SidebarMenuItem>
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        {mode === "destroyer" && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Destroyer Settings</SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">
+                  Block Material
+                </label>
+                <Select defaultValue="wood">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="wood">Wood</SelectItem>
+                    <SelectItem value="stone">Stone</SelectItem>
+                    <SelectItem value="metal">Metal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {mode === "creator" && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Creator Objectives</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <p className="text-sm text-muted-foreground">
+                Reach the target height using projectile placement.
+              </p>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        <SidebarGroup>
+          <SidebarGroupLabel>Physics</SidebarGroupLabel>
+          <SidebarGroupContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Settings size={16} />
+                Physics Mode
+              </span>
+              <Switch checked={physicsMode} onCheckedChange={setPhysicsMode} />
+            </div>
+
+            {physicsMode && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">
+                    Gravity (g)
+                  </label>
+                  <Slider min={1} max={20} step={0.1} defaultValue={[9.8]} />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">
+                    Projectile Mass
+                  </label>
+                  <Slider min={0.1} max={10} step={0.1} defaultValue={[1]} />
+                </div>
+              </div>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
