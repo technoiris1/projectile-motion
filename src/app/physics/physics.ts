@@ -12,7 +12,9 @@ export type Projectile = {
 
 export type PhysicsConfig = {
   gravity: number;
+  groundY: number;
 };
+
 export function stepProjectile(
   p: Projectile,
   dt: number,
@@ -20,5 +22,11 @@ export function stepProjectile(
 ) {
   if (!p.active) return;
   p.velocity.y += config.gravity * dt;
+  p.position.x += p.velocity.x * dt;
   p.position.y += p.velocity.y * dt;
+  if (p.position.y + p.radius >= config.groundY) {
+    p.position.y = config.groundY - p.radius;
+    p.velocity.y = 0;
+    p.velocity.x = 0;
+  }
 }

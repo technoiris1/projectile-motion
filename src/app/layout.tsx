@@ -2,12 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { ControlMenu } from "./components/sidebar";
 
 const geistSans = Geist({
@@ -36,12 +31,7 @@ export default function RootLayout({
         <SidebarProvider>
           <ControlMenu />
 
-          <SidebarInset>
-            <div className="relative">
-              <SidebarTrigger className="absolute top-4 left-4 z-10" />
-              <main className="min-h-screen">{children}</main>
-            </div>
-          </SidebarInset>
+          <main className="relative min-h-screen">{children}</main>
         </SidebarProvider>
       </body>
     </html>
