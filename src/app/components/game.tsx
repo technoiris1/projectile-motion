@@ -1,15 +1,15 @@
 import { VT323 } from "next/font/google";
+import { GameCanvas } from "./GameCanvas";
+
 const VT3 = VT323({
   weight: "400",
   subsets: ["latin"],
 });
-import { GameCanvas } from "./GameCanvas";
+
 export function Game() {
   return (
-    <div className="relative min-h-screen w-full bg-repeat bg-center">
-      <div className="absolute inset-0 flex items-center justify-center text-white/80">
-        <GameCanvas />
-      </div>
+    <div className="relative h-screen w-full">
+      <GameCanvas />
     </div>
   );
 }

@@ -9,7 +9,6 @@ export type Projectile = {
   radius: number;
   active: boolean;
 };
-
 export type PhysicsConfig = {
   gravity: number;
   groundY: number;

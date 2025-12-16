@@ -29,9 +29,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <SidebarProvider>
-          <ControlMenu />
-
-          <main className="relative min-h-screen">{children}</main>
+          <div className="flex min-h-screen w-full">
+            <ControlMenu />
+            <main className="flex-1 relative">{children}</main>
+          </div>
         </SidebarProvider>
       </body>
     </html>

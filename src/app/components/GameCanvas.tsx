@@ -8,9 +8,9 @@ export function GameCanvas() {
   const groundImage = useRef<HTMLImageElement | null>(null);
 
   const projectile = useRef<Projectile>({
-    position: { x: 150, y: 200 },
+    position: { x: 200, y: 150 },
     velocity: { x: 0, y: 0 },
-    radius: 8,
+    radius: 10,
     active: true,
   });
 
@@ -19,9 +19,9 @@ export function GameCanvas() {
     const ctx = canvas.getContext("2d")!;
 
     function resize() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      const parent = canvas.parentElement!;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
     }
 
     resize();
@@ -57,9 +57,9 @@ export function GameCanvas() {
       }
 
       const p = projectile.current;
+      ctx.fillStyle = "#ff3333";
       ctx.beginPath();
       ctx.arc(p.position.x, p.position.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#ff5555";
       ctx.fill();
 
       requestAnimationFrame(loop);
@@ -73,10 +73,10 @@ export function GameCanvas() {
   }, []);
 
   return (
-    <div className="fixed inset-0">
+    <div className="w-full h-full">
       <canvas
         ref={canvasRef}
-        className="w-full h-full"
+        className="block w-full h-full"
         style={{
           backgroundImage: "url('/bg1.png')",
           backgroundSize: "cover",
