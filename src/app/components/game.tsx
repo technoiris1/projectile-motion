@@ -3,7 +3,7 @@ const VT3 = VT323({
   weight: "400",
   subsets: ["latin"],
 });
-
+import { GameCanvas } from "./GameCanvas";
 export function Game() {
   return (
     <div
@@ -13,9 +13,7 @@ export function Game() {
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center text-white/80">
-        <span className={`text-4xl  ${VT3.className}`}>
-          Game canvas loading…
-        </span>
+        <GameCanvas />
       </div>
     </div>
   );
