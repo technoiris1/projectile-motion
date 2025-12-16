@@ -6,13 +6,19 @@ import { Projectile, stepProjectile } from "../physics/physics";
 export function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const groundImage = useRef<HTMLImageElement | null>(null);
+  const bgImage = useRef<HTMLImageElement | null>(null);
+
+  const cannon = useRef({ x: 260, y: 0 });
 
   const projectile = useRef<Projectile>({
-    position: { x: 200, y: 150 },
+    position: { x: 0, y: 0 },
     velocity: { x: 0, y: 0 },
-    radius: 10,
-    active: true,
+    radius: 12,
+    active: false,
   });
+
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const dragCurrent = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -22,32 +28,76 @@ export function GameCanvas() {
       const parent = canvas.parentElement!;
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
+      cannon.current.y = canvas.height - 160;
     }
 
     resize();
     window.addEventListener("resize", resize);
+    const ground = new Image();
+    ground.src = "/dirt.png";
+    ground.onload = () => (groundImage.current = ground);
 
-    const img = new Image();
-    img.src = "/dirt.png";
-    img.onload = () => {
-      groundImage.current = img;
-    };
+    const bg = new Image();
+    bg.src = "/bg1.png";
+    bg.onload = () => (bgImage.current = bg);
 
-    let lastTime = performance.now();
+    function getMouse(e: MouseEvent) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    }
 
-    function loop(time: number) {
-      const dt = (time - lastTime) / 1000;
-      lastTime = time;
+    canvas.addEventListener("mousedown", (e) => {
+      if (projectile.current.active) return;
+      dragStart.current = getMouse(e);
+      dragCurrent.current = dragStart.current;
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!dragStart.current) return;
+      dragCurrent.current = getMouse(e);
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (!dragStart.current || !dragCurrent.current) return;
+
+      const dx = dragStart.current.x - dragCurrent.current.x;
+      const dy = dragStart.current.y - dragCurrent.current.y;
+
+      projectile.current = {
+        position: {
+          x: cannon.current.x,
+          y: cannon.current.y,
+        },
+        velocity: {
+          x: dx * 6,
+          y: dy * 6,
+        },
+        radius: 12,
+        active: true,
+      };
+
+      dragStart.current = null;
+      dragCurrent.current = null;
+    });
+
+    let last = performance.now();
+
+    function loop(now: number) {
+      const dt = (now - last) / 1000;
+      last = now;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const groundY = canvas.height - 80;
-
-      stepProjectile(projectile.current, dt, {
-        gravity: 1200,
-        groundY,
-      });
-
+      if (bgImage.current) {
+        ctx.drawImage(bgImage.current, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = "#87ceeb";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
       if (groundImage.current) {
         const pattern = ctx.createPattern(groundImage.current, "repeat");
         if (pattern) {
@@ -55,34 +105,43 @@ export function GameCanvas() {
           ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
         }
       }
-
-      const p = projectile.current;
-      ctx.fillStyle = "#ff3333";
-      ctx.beginPath();
-      ctx.arc(p.position.x, p.position.y, p.radius, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.save();
+      ctx.translate(cannon.current.x, cannon.current.y);
+      ctx.fillStyle = "#333";
+      ctx.fillRect(-30, -12, 60, 24);
+      ctx.restore();
+      if (dragStart.current && dragCurrent.current) {
+        ctx.strokeStyle = "rgba(255,255,255,0.7)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cannon.current.x, cannon.current.y);
+        ctx.lineTo(dragCurrent.current.x, dragCurrent.current.y);
+        ctx.stroke();
+      }
+      stepProjectile(projectile.current, dt, {
+        gravity: 1200,
+        groundY,
+      });
+      if (projectile.current.active) {
+        ctx.fillStyle = "#ff3333";
+        ctx.beginPath();
+        ctx.arc(
+          projectile.current.position.x,
+          projectile.current.position.y,
+          projectile.current.radius,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+      }
 
       requestAnimationFrame(loop);
     }
 
     requestAnimationFrame(loop);
 
-    return () => {
-      window.removeEventListener("resize", resize);
-    };
+    return () => window.removeEventListener("resize", resize);
   }, []);
 
-  return (
-    <div className="w-full h-full">
-      <canvas
-        ref={canvasRef}
-        className="block w-full h-full"
-        style={{
-          backgroundImage: "url('/bg1.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-    </div>
-  );
+  return <canvas ref={canvasRef} className="w-full h-full block" />;
 }

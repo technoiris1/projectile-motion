@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ARC//LAB",
-  description: "Projectile physics playground",
+  title: "Traject",
+  description: "Projectile simulation based game",
 };
 
 export default function RootLayout({
