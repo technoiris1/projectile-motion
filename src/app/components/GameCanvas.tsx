@@ -82,6 +82,10 @@ export function GameCanvas() {
       dragStart.current = null;
       dragCurrent.current = null;
     });
+    canvas.addEventListener("mouseleave", () => {
+      dragStart.current = null;
+      dragCurrent.current = null;
+    });
 
     let last = performance.now();
 
